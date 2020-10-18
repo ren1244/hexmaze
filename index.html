@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>六角形迷宮</title>
+<script type="text/javascript" src="hexmaze.js"></script>
+<script type="text/javascript">
+function run()
+{
+	var maze;
+	var w=parseInt(document .getElementById("width").value, 10);
+	var h=parseInt(document .getElementById("height").value, 10);
+	var d=parseFloat(document .getElementById("De").value);
+	var step=parseInt(document .getElementById("step").value);
+	var sol=document .getElementById("solution").checked;
+	maze=new HexMaze(h,w,true,step);
+	document .getElementById("SVG_DIV").innerHTML=maze.Show_svg(d,sol);
+}
+function sol_selec_change()
+{
+	var str=document .getElementById("SVG_DIV").innerHTML;
+	var sol=document .getElementById("solution").checked;
+	if(sol)
+		str=str.replace(/stroke:none/g,"stroke:red");
+	else
+		str=str.replace(/stroke:red/g,"stroke:none");
+	document .getElementById("SVG_DIV").innerHTML=str;
+}
+</script>
+<style type="text/css">
+	.num{width:4em;text-align:center;}
+</style>
+</head>
+<body>
+	尺寸：<input id="width" type="text" class="num" value="10">x<input id="height" type="text" class="num" value="10"><br>
+	邊長：<input id="De" type="text" class="num" value="20"><br>
+	步長：<input id="step" type="text" class="num" value="6">
+	<br><input id="solution" type="checkbox" onchange="sol_selec_change()">顯示解答<button onclick="run()">產生</button>
+	<div id="SVG_DIV"></div>
+	<div id="NOTE"></div>
+</body>
+</html>
