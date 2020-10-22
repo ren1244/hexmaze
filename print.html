@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="Zh-Hant">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>六角迷宮-列印版</title>
+    <script src="dist/print.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row position-relative justify-content-center">
+            <img src="img/maze.png" style="opacity: 0.5;height: 150px;">
+            <div class="position-absolute w-100 h-100 d-flex flex-column justify-content-center align-items-center" style="top: 0px; left:0px;">
+                    <h1>六角迷宮產生器</h1>
+                    <span>批次產生大量迷宮</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <h2>說明</h2>
+                <p>設定好版面後，產生 PDF 前有循環次數可以選擇，這會重複之前的設定 N 次，批次產生不同的迷宮。</p>
+                <p>將產生的 PDF 拿到超商列印就可以玩了，所占空間越大會越難，難度可以參考右表。</p>
+                <p>如果要給很多小孩玩，設計版面時可以考慮雙面列印再裁切，會比較節省紙張。</p>
+            </div>
+            <div class="col-md-6">
+                <h2>難度</h2>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Lv.0 ~ Lv.3</th>
+                        <th>Lv.2+、Lv.3+</th>
+                    </tr>
+                    <tr>
+                        <td>[1/4版] 全年齡</td>
+                        <td>[半版] 想進一步挑戰</td>
+                    </tr>
+                    <tr>
+                        <th>競速</th>
+                        <th>史詩、神話</th>
+                    </tr>
+                    <tr>
+                        <td>[半版/全版] 辦活動</td>
+                        <td>[全版] 求虐</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div id="pageList" class="row justify-content-start border">
+            <div id="addNewPage" class="pageList-div">
+                <svg width="141" height="199" viewBox="-0.5 -0.5 141 199">
+                    <rect x="0" y="0" width="140" height="198" class="svg-page"/>
+                    <circle cx="70" cy="99" r="26" class="svg-icon"/>
+                    <path d="M 70,86 l 0,26 M 57,99 l 26,0" class="svg-icon"/>
+                    <text x="70" y="146" class="svg-text-hint" dominant-baseline="middle">新增頁面</text>
+                </svg>
+                <div><span>&nbsp;</span></div>
+            </div>
+            <div id="download" class="pageList-div" style="display:none">
+                <svg width="141" height="199" viewBox="-0.5 -0.5 141 199">
+                    <rect x="0" y="0" width="140" height="198" class="svg-page"/>
+                    <path d="M 50,125 l 40,0 M 70,122 l -20,-20 M 70,122 l 20,-20 M 70,122 l 0,-45" class="svg-icon"/>
+                    <text x="70" y="146" class="svg-text-hint" dominant-baseline="middle">PDF下載</text>
+                </svg>
+                <div><span>&nbsp;</span></div>
+            </div>
+        </div>
+    </div>
+    <div id="pageSelector" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">請選擇版型</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row" id="pageSelectorOption">
+                            <div class="col">
+                                <svg width="141" height="199" viewBox="-0.5 -0.5 141 199" data-layout="4">
+                                    <rect x="0" y="0" width="140" height="198" class="svg-page"/>
+                                    <rect x="7" y="7" width="61" height="90" class="page-grid layout-4" data-textId="0" data-align="7"/>
+                                    <rect x="72" y="7" width="61" height="90" class="page-grid layout-4" data-textId="1" data-align="9"/>
+                                    <rect x="7" y="101" width="61" height="90" class="page-grid layout-4" data-textId="2" data-align="1"/>
+                                    <rect x="72" y="101" width="61" height="90" class="page-grid layout-4" data-textId="3" data-align="3"/>
+                                    <text x="37.5" y="52" class="svg-text" dominant-baseline="middle">1</text>
+                                    <text x="102.5" y="52" class="svg-text" dominant-baseline="middle">2</text>
+                                    <text x="37.5" y="146" class="svg-text" dominant-baseline="middle">3</text>
+                                    <text x="102.5" y="146" class="svg-text" dominant-baseline="middle">4</text>
+                                </svg>
+                            </div>
+                            <div class="col">
+                                <svg width="141" height="199" viewBox="-0.5 -0.5 141 199" data-layout="3">
+                                    <rect x="0" y="0" width="140" height="198" class="svg-page"/>
+                                    <rect x="7" y="7" width="61" height="90" class="page-grid layout-4" data-textId="0" data-align="7"/>
+                                    <rect x="72" y="7" width="61" height="90" class="page-grid layout-4" data-textId="1" data-align="9"/>
+                                    <rect x="7" y="101" width="126" height="90" class="page-grid layout-2" data-textId="2" data-align="2"/>
+                                    <text x="37.5" y="52" class="svg-text" dominant-baseline="middle">1</text>
+                                    <text x="102.5" y="52" class="svg-text" dominant-baseline="middle">2</text>
+                                    <text x="70" y="146" class="svg-text" dominant-baseline="middle">3</text>
+                                </svg>
+                            </div>
+                            <div class="col">
+                                <svg width="141" height="199" viewBox="-0.5 -0.5 141 199" data-layout="2">
+                                    <rect x="0" y="0" width="140" height="198" class="svg-page"/>
+                                    <rect x="7" y="7" width="126" height="90" class="page-grid layout-2" data-textId="0" data-align="8"/>
+                                    <rect x="7" y="101" width="126" height="90" class="page-grid layout-2" data-textId="1" data-align="2"/>
+                                    <text x="70" y="52" class="svg-text" dominant-baseline="middle">1</text>
+                                    <text x="70" y="146" class="svg-text" dominant-baseline="middle">2</text>
+                                </svg>
+                            </div>
+                            <div class="col">
+                                <svg width="141" height="199" viewBox="-0.5 -0.5 141 199" data-layout="1">
+                                    <rect x="0" y="0" width="140" height="198" class="svg-page"/>
+                                    <rect x="7" y="7" width="126" height="184" class="page-grid layout-1" data-textId="0" data-align="5"/>
+                                    <text x="70" y="99" class="svg-text" dominant-baseline="middle">1</text>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="mazeSelector1" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">選擇迷宮類型</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex flex-column">
+                        <button type="button" class="mazeButton btn m-1 btn-outline-primary">競速</button>
+                        <button type="button" class="mazeButton btn m-1 btn-outline-primary">史詩</button>
+                        <button type="button" class="mazeButton btn m-1 btn-outline-primary">神話</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mazeSelector2" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">選擇迷宮類型</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex flex-column">
+                        <button type="button" class="mazeButton btn m-1 btn-outline-primary">Lv.2+</button>
+                        <button type="button" class="mazeButton btn m-1 btn-outline-primary">Lv.3+</button>
+                        <button type="button" class="mazeButton btn m-1 btn-outline-primary">競速(省紙)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mazeSelector4" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">選擇迷宮類型</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex flex-column">
+                        <button type="button" class="mazeButton btn m-1 btn-outline-primary">Lv.0</button>
+                        <button type="button" class="mazeButton btn m-1 btn-outline-primary">Lv.1</button>
+                        <button type="button" class="mazeButton btn m-1 btn-outline-primary">Lv.2</button>
+                        <button type="button" class="mazeButton btn m-1 btn-outline-primary">Lv.3</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="downloadOptions" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">輸出設定</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-4">
+                            <span class="align-middle">重複產生</span>
+                        </div>
+                        <div class="col-6">
+                            <input type="number" id="repeatCount" value="1" class="form-control">
+                        </div>
+                        <div class="col-2">
+                            <span class="align-middle">組</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">確認</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="progress" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">迷宮產生中</h5>
+                </div>
+                <div class="modal-body">
+                    <span id="progressLog"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="pdfShow" style="display: none;">
+        <iframe id="pdfShowFram"></iframe>
+    </div>
+</body>
+</html>
