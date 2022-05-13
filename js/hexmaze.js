@@ -42,6 +42,7 @@
 	RefreshGroup(index,new_g) //以index為起始點及其鄰近同群組編號的格子，都填上新的群組編號
 備註：
 	方向：以wsxqaz代表的話，依序為012345，對角線相加為5，%3及/3可判斷上下左右
+	（0右上, 1正右, 2右下, 3左上, 4正左, 5左下）
 	A[]最低6個位元儲存了方向的牆壁是否打開(0打開1不可通過)，6位元以上為群組
 */
 Number.prototype.ffix=function(fixed)
@@ -63,6 +64,7 @@ function HexMaze(h,w,f,step) // w(+1) x h 的迷宮
 	this.A=[];
 	this.pathCache=null;
 	this.RandomMaze(step);
+	this.wallThickness = 100;
 }
 HexMaze.prototype.ConvToMN=function(idx)
 {
@@ -78,7 +80,11 @@ HexMaze.prototype.ConvToIndex=function(m,n)
 {
 	var q1=(2*this.n+1);
 	var q2=this.n+(this.flag?1:0);
-	return (m/2|0)*q1+(m%2)*q2+n;
+	var q3 = this.n + (m + (this.flag?1:0) & 1);
+	if(n<0 || n>=q3 || m<0 || m>=this.m) {
+		return -1;
+	}
+	return (m>>>1)*q1+(m%2)*q2+n;
 }
 HexMaze.prototype.IsInRangeNear=function(idx,k) //檢查A[idx]格子往k方向的格子是否存在
 {
@@ -551,6 +557,101 @@ HexMaze.prototype.GetSolution=function(idi,idf)
 		stack[i].d-=1;
 	}
 	return stack;
+}
+
+HexMaze.prototype.setWallThickness=function(wallThickness) {
+	this.wallThickness = wallThickness;
+}
+/**
+ * 位置是否可通行
+ */
+HexMaze.prototype.enableStand=function(x, y, dbg) {
+	x -= (this.flag ? 866 : 1732);
+	y -= 1000;
+	let n = Math.floor(x / 1732 - y / 3000);
+	let m = Math.floor(y / 1500);
+	let result = {
+		n: null,
+		m: null,
+		d: 99999999
+	};
+	function updateResult(n, m, r) {
+		//n+= (m + (this.flag ? 0 : 1) >> 1);
+		let dx = 1732 * n + 866 * m - x;
+		let dy = 1500 * m - y;
+		let d = dx * dx + dy * dy;
+		if(d < r.d) {
+			r.m = m;
+			r.n = n;
+			r.d = d;
+		}
+	}
+	updateResult(n, m, result);
+	updateResult(n, m+1, result);
+	updateResult(n+1, m, result);
+	updateResult(n+1, m+1, result);
+	//修正後，(m, n) 是 maze 的mn, result 的是斜角坐標系的座標值
+	n = result.n + (result.m + (this.flag ? 0 : 1) >> 1);
+	m = result.m;
+	let idx = this.ConvToIndex(m, n);
+	if(idx < 0) {
+		return false;
+	}
+	//相對此格中心點座標
+	x -= 1732 * result.n + 866 * result.m;
+	y -= 1500 * result.m;
+	let dis = 866 - this.wallThickness;
+	let d1 = (500 * x + 866 * y)/1000;
+	let d2 = (500 * x - 866 * y)/1000;
+	let cell = this.A[idx];
+	if(
+		((cell&1) && d2>dis) ||
+		((cell&2) && x>dis) ||
+		((cell&4) && d1>dis) ||
+		((cell&8) && d1<-dis) ||
+		((cell&16) && x<-dis) ||
+		((cell&32) && d2<-dis)
+	) {
+		return false;
+	}
+	//判斷牆壁末端的點
+	let nRight = n + ((this.flag?0:1) + m & 1);
+	let dW = this.wallThickness * this.wallThickness;
+	const offsets = [
+		{dir: 0, x: 0, y:1000, c: 4, l: 1},
+		{dir: 1, x: -866, y:500, c: 3, l: 2},
+		{dir: 2, x: -866, y:-500, c: 0, l: 5},
+		{dir: 5, x: 0, y:-1000, c: 1, l: 4},
+		{dir: 4, x: 866, y:-500, c: 2, l: 3},
+		{dir: 3, x: 866, y:500, c: 5, l: 0}
+	];
+	let nearCells = [
+		this.ConvToIndex(m-1, nRight),
+		this.ConvToIndex(m, n+1),
+		this.ConvToIndex(m+1, nRight),
+		this.ConvToIndex(m+1, nRight-1),
+		this.ConvToIndex(m, n-1),
+		this.ConvToIndex(m-1, nRight-1),
+	].map(idx=>(idx>0 ? this.A[idx] : false));
+	for(let i=0; i<6; ++i) {
+		let curWallExists = (cell & 1 << offsets[i].dir);
+		let lastWallExists = (cell & 1 << offsets[(i+5)%6].dir);
+		if(!curWallExists && !lastWallExists) {
+			let o = offsets[i];
+			let j = (i+5)%6;
+			if(
+				(nearCells[i] && (nearCells[i] & 1 << o.c)) ||
+				(nearCells[j] && (nearCells[j] & 1 << o.l))
+			) {
+				let dx = x + o.x;
+				let dy = y + o.y;
+				if(dx*dx+dy*dy<dW) {
+					return false;
+				}
+			}
+		}
+	}
+	return true;
 }
 
 try{
