@@ -28,6 +28,8 @@
 	Show_svg(r,with_sol) //回傳迷宮svg圖片字串
 	RandomMaze(step) //重新亂數產生迷宮
 	getPaths() //回傳 pathInfo 物件
+	enableStand(x, y) //判斷 x, y 是否可站立（撞牆或超出迷宮範圍回傳 false），牆壁邊長為 1000
+	setWallThickness(wallThickness) //設定牆壁厚度，這會影響可站立範圍，此值應介於 (0, 866)
 開發介面：
 	[轉換]
 	ConvToMN(index) //將index轉換為object{m,n,o},o代表該row是否+1
@@ -565,7 +567,7 @@ HexMaze.prototype.setWallThickness=function(wallThickness) {
 /**
  * 位置是否可通行
  */
-HexMaze.prototype.enableStand=function(x, y, dbg) {
+HexMaze.prototype.enableStand=function(x, y) {
 	x -= (this.flag ? 866 : 1732);
 	y -= 1000;
 	let n = Math.floor(x / 1732 - y / 3000);
@@ -652,6 +654,17 @@ HexMaze.prototype.enableStand=function(x, y, dbg) {
 		}
 	}
 	return true;
+}
+
+HexMaze.prototype.getXY=function(m, n) {
+	if(n===undefined) {
+		let o = this.ConvToMN(m);
+		m = o.m;
+		n = o.n - (m + (this.flag ? 0 : 1) >> 1);
+	}
+	let x = (this.flag ? 866 : 1732) + 1732 * n + 866 * m;
+	let y = 1000 + 1500 * m;
+	return [x, y];
 }
 
 try{

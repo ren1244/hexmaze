@@ -4,7 +4,8 @@ const path = require('path');
 module.exports = {
     entry: {
         print: './js/print.js',
-        index: './js/index.js'
+        index: './js/index.js',
+        game: './js/game.js'
     },
     output: {
         filename: '[name].js',

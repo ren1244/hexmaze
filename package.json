@@ -16,7 +16,8 @@
     "bootstrap": "^4.5.3",
     "jquery": "^3.5.1",
     "pako": "^1.0.11",
-    "popper.js": "^1.16.1"
+    "popper.js": "^1.16.1",
+    "three": "^0.140.2"
   },
   "devDependencies": {
     "css-loader": "^5.0.0",
